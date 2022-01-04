@@ -3,6 +3,7 @@ import streamlit_authenticator as stauth
 from app_run import *
 from comments import *
 
+st.set_page_config(page_title="Terrorism Analysis", layout="wide")
 names = ['Prince Ngema','Tsholo Moleleko','Peter Manda','Joseph Mukupe']
 usernames = ['princen','tsholom','peterm','jmukupe']
 passwords = ['1234','1234','1234','1234']
