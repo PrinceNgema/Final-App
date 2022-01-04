@@ -2,6 +2,10 @@ import pandas as pd
 import streamlit as st
 import sqlite3 
 from datetime import date
+import plotly.graph_objects as go
+import plotly.express as px
+from st_aggrid import AgGrid
+from st_aggrid.grid_options_builder import GridOptionsBuilder
 
 conn = sqlite3.connect('comment.db',check_same_thread=False)
 c = conn.cursor()
@@ -117,18 +121,18 @@ def comment():
         add_comments()
         
     elif choose == "Search Comments":
-        st.subheader("Search Comments")
         search_term = st.text_input('Enter Search Term')
-        search_choice = st.radio("Field to Search By",("title","author"))
+        search_choice = st.radio("Field to Search By",("Title","Author"))
         
         if st.button("Search"):
-
-            if search_choice == "title":
-                article_result = get_blog_by_title(search_term)
-            elif search_choice == "author":
+            if search_choice == "Title":
+                article_result = get_blog_by_title(search_term)	
+                if not article_result:
+                    st.subheader('Title Not Found!!!')    	
+            elif search_choice == "Author":
                 article_result = get_blog_by_author(search_term)
-
-
+                if not article_result:
+                    st.subheader('Author Not Found!!!') 
             for i in article_result:
                 b_author = i[0]
                 b_title = i[1]
@@ -139,37 +143,58 @@ def comment():
                 st.markdown(full_message_temp.format(b_article),unsafe_allow_html=True)
 
     elif choose == "Manage Comments":
-        st.subheader("Manage Comments")
-
         result = view_all_notes()
         clean_db = pd.DataFrame(result,columns=["Author","Title","Articles","Post Date"])
-        st.dataframe(clean_db)
-
-        unique_titles = [i[0] for i in view_all_titles()]
-        delete_blog_by_title = st.selectbox("Unique Title",unique_titles)
-        new_df = clean_db
-        if st.button("Delete"):
-            delete_data(delete_blog_by_title)
-            st.warning("Deleted: '{}'".format(delete_blog_by_title))
 
 
-        if st.checkbox("Metrics"):
-            
-            new_df['Length'] = new_df['Articles'].str.len()
-            st.dataframe(new_df)
+        shows = clean_db.rename(columns ={'Articles':'Comments'})
+        gb = GridOptionsBuilder.from_dataframe(shows)
 
+        gb.configure_pagination()
+        gb.configure_side_bar()
+        gb.configure_default_column(groupable=True, value=True, enableRowGroup=True, aggFunc="sum", editable=True)
+        gridOptions = gb.build()
 
-            st.subheader("Author Stats")
-            new_df["Author"].value_counts().plot(kind='bar')
-            st.pyplot()
+        AgGrid(shows, gridOptions=gridOptions, enable_enterprise_modules=True)
 
-            st.subheader("Author Stats")
-            new_df['Author'].value_counts().plot.pie(autopct="%1.1f%%")
-            st.pyplot()
-
-        if st.checkbox("BarH Plot"):
-            st.subheader("Length of Articles")
+                
+        with st.expander('Delete Comment'):
+            unique_titles = [i[0] for i in view_all_titles()]
+            delete_blog_by_title = st.selectbox("Title",unique_titles)
             new_df = clean_db
+            if st.button("Delete"):
+                delete_data(delete_blog_by_title)
+                st.warning("Deleted: '{}'".format(delete_blog_by_title))
+        if st.checkbox("Metrics"):
             new_df['Length'] = new_df['Articles'].str.len()
-            barh_plot = new_df.plot.barh(x='Author',y='Length',figsize=(20,10))
-            st.pyplot()
+            #st.dataframe(new_df)
+            st.subheader("Author Stats")
+            dg = new_df.groupby('Author').count()
+            dg = dg.reset_index()
+            dg = dg.rename(columns = {'Title':'Number of Comments'})
+            fig = px.bar(dg, x='Author', y='Number of Comments')
+            fig.update_layout(
+            autosize=True,
+            width=1000,
+            height=600)
+            fig.update_layout(
+            xaxis=dict(
+                showline=True,
+                showgrid=False,
+                showticklabels=True,
+                
+                #visible = False  
+            ),
+            # Turn off everything on y axis
+            yaxis=dict(
+                showgrid=False,
+                zeroline=False,
+                showline=False,
+                showticklabels= True,
+            ),
+            showlegend=False,
+            xaxis_tickangle=-45,
+            plot_bgcolor= 'rgba(0,0,0,0)'
+        )
+            st.plotly_chart(fig)
+    
