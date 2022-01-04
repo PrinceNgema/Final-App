@@ -86,30 +86,21 @@ news_message_temp= """
 def add_comments():
         st.subheader("Add Comments")
         create_table()
-        blog_author = st.text_input("Enter Author Name",max_chars=50)
-        blog_title = st.text_input("Enter Comment Title")
-        blog_article = st.text_area("Write Comment Here",height=200)
+        blog_author =  st.session_state['name']
+        blog_title = st.text_input("Enter Comment Title",key = 100)
+        blog_article = st.text_area("Write Comment Here",height=200,key = 101)
         blog_post_date = date.today()
-        if st.button("Add"):
+        if st.button("Add",key = 103):
             add_data(blog_author,blog_title,blog_article,blog_post_date)
             st.success("Comments:{} saved".format(blog_title))
 def comment():
     #st.markdown(html_temp.format('blue','white'),unsafe_allow_html=True)
-    st.header('Comments Highlights')
-    menu = ["Comments Highlights","Add Comments","View Comments","Search Comments","Manage Comments"]
-    choose = st.sidebar.selectbox("Menu",menu)
+    
+    menu = ["View Comments","Add Comments","Search Comments","Manage Comments"]
+    choose = st.sidebar.selectbox("",menu)
 
-    if choose == "Comments Highlights":
-        result = view_all_notes()
-        for i in result:
-            b_author = i[0]
-            b_title = i[1]
-            b_article = str(i[2])[0:30]
-            b_post_date = i[3]
-            st.markdown(title_temp.format(b_title,b_author,b_article,b_post_date),unsafe_allow_html=True)
-
-    elif choose == "View Comments":
-        st.subheader("View Comments")
+    if choose == "View Comments":
+        #st.subheader("View Comments")
         all_titles = [i[0] for i in view_all_titles()]
         postlist = st.sidebar.selectbox("View Comments",all_titles)
         post_result = get_blog_by_title(postlist)
