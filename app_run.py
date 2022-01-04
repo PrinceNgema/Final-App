@@ -3,6 +3,7 @@ import plotly.express as px
 import streamlit as st
 import plotly.graph_objects as go
 from comments import *
+#from login import *
 import datetime
 
 
@@ -14,14 +15,16 @@ def add_data(author,title,article,postdate):
 def add_comment():
         #st.subheader("Add Comments")
         #create_table()
-        blog_author = st.text_input("Enter Author Name",max_chars=50)
-        blog_title = st.text_input("Enter Comment Title")
-        blog_article = st.text_area("Write Comment Here",height=200)
-        now  = datetime.datetime.now()
-        blog_post_date = now.strftime("%Y-%m-%d %H:%M:%S")
-        if st.button("Add"):
-            add_data(blog_author,blog_title,blog_article,blog_post_date)
-            st.success("Comments:{} saved".format(blog_title))
+        #blog_author = st.text_input("Enter Author Name",max_chars=50)
+        with st.sidebar.container():
+            blog_author =  st.session_state['name']
+            blog_title = st.text_input("Enter Comment Title")
+            blog_article = st.text_area("Write Comment Here",height=200)
+            now  = datetime.datetime.now()
+            blog_post_date = now.strftime("%Y-%m-%d %H:%M:%S")
+            if st.button("Add"):
+                add_data(blog_author,blog_title,blog_article,blog_post_date)
+                st.success("Comments:{} saved".format(blog_title))
 
 def run():
     @st.cache(allow_output_mutation=True)
@@ -173,7 +176,7 @@ def run():
                         title = "Total Terrorist Attacks, Total Deaths and Total Injuries {} from 2000 to 2019 ".format(country))
             fig.update_layout(
             autosize=True,
-            width=1300,
+            width=1150,
             height=600,)
             fig.update_layout(
                     xaxis=dict(
@@ -213,7 +216,7 @@ def run():
             fig.update_layout(uniformtext_minsize=8,yaxis_title=None, xaxis_title = None)
             fig.update_layout(
                     autosize=True,
-                    width=1300,
+                    width=1150,
                     height=600)
             fig.update_layout(
                     xaxis=dict(
@@ -232,7 +235,7 @@ def run():
                     ),
                     showlegend=True,
                     plot_bgcolor= 'rgba(0,0,0,0)',
-                    title = "10 Most Targeted Groups"
+                    title = "Top 10 Most Targeted Groups"
                 )
             st.plotly_chart(fig)
             #### Method of attacks
@@ -245,7 +248,7 @@ def run():
             fig.update_layout(uniformtext_minsize=8,yaxis_title=None, xaxis_title = None)
             fig.update_layout(
                     autosize=True,
-                    width=1300,
+                    width=1150,
                     height=600)
             fig.update_layout(
                     xaxis=dict(
@@ -273,10 +276,10 @@ def run():
             burst = sun_burst.groupby(['Target','Attack Type','Weapon Type','Weapon Sub Type']).sum().sort_values(by = ['Deaths'],ascending = False)
             burst = burst.reset_index()
             burst = burst[burst['Deaths'] > 100]
-            fig = px.sunburst(burst, path=['Target','Attack Type','Weapon Type','Weapon Sub Type'], values='Deaths',title = '10 Ten Attacked Groups and Methods of Attacks')
+            fig = px.sunburst(burst, path=['Target','Attack Type','Weapon Type','Weapon Sub Type'], values='Deaths',title = 'Top 10 Attacked Groups and Methods of Attacks')
             fig.update_layout(
             autosize=True,
-            width=1300,
+            width=1150,
             height=700,)
             fig.update_layout(
                     xaxis=dict(
@@ -303,12 +306,12 @@ def run():
             sui = sui.reset_index()
             sui = sui[sui['Perpetrator Name'] != 'Unknown']
 
-            fig1 = px.bar(sui , y='eventid', x='Perpetrator Name', text='eventid', color='Perpetrator Name', title = "10 Most Suicidal Terrorist Group 2000-2019")
+            fig1 = px.bar(sui , y='eventid', x='Perpetrator Name', text='eventid', color='Perpetrator Name', title = "Top 10 Most Suicidal Terrorist Group 2000-2019")
             fig1.update_traces(textposition='outside')
             fig1.update_layout(uniformtext_minsize=8,yaxis_title=None, xaxis_title = None)
             fig1.update_layout(
                     autosize=True,
-                    width=1300,
+                    width=1150,
                     height=600)
             fig1.update_layout(
                     xaxis=dict(
@@ -336,12 +339,12 @@ def run():
             dg =dg.groupby('Perpetrator Name').sum().sort_values(by = ['Deaths'],ascending= False).head(10)
             dg = dg.reset_index()
             dg = dg[dg['Perpetrator Name'] != 'Unknown']
-            fig = px.bar(dg , y='Deaths', x='Perpetrator Name', text='Deaths', color='Perpetrator Name', title = "10 Most Deadliest Group 2000-2019")
+            fig = px.bar(dg , y='Deaths', x='Perpetrator Name', text='Deaths', color='Perpetrator Name', title = "Top 10 Most Deadliest Group 2000-2019")
             fig.update_traces(textposition='outside')
             fig.update_layout(uniformtext_minsize=8,yaxis_title=None, xaxis_title = None)
             fig.update_layout(
                     autosize=True,
-                    width=1300,
+                    width=1150,
                     height=600)
             fig.update_layout(
                     xaxis=dict(
@@ -365,7 +368,8 @@ def run():
             st.plotly_chart(fig)
         if tab == "Comments":
             comment()
-        with st.sidebar.expander("Add Comment"):
+        comm = st.sidebar.checkbox("Add Comment")
+        if comm:
             add_comment()
         
     terror_map()
