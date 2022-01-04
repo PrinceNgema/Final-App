@@ -1,6 +1,7 @@
 import streamlit as st
 import streamlit_authenticator as stauth
 from app_run import *
+from comments import *
 
 names = ['Prince Ngema','Tsholo Moleleko','Peter Manda','Joseph Mukupe']
 usernames = ['princen','tsholom','peterm','jmukupe']
