@@ -78,7 +78,7 @@ def run():
             fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0},
             showlegend = False)
             fig.layout.updatemenus[0].buttons[0].args[1]["frame"]["duration"] = 1000
-            st.plotly_chart(fig)
+            st.plotly_chart(fig,use_container_width = True)
         if tab == "Analytics":
             @st.cache(allow_output_mutation=True)
             def data():
@@ -113,7 +113,7 @@ def run():
                                 height=300)
                     fig.update_traces(delta_increasing_color='red', selector=dict(type='indicator'))
                     fig.update_traces(delta_decreasing_color='green', selector=dict(type='indicator'))
-                    st.plotly_chart(fig)
+                    st.plotly_chart(fig,use_container_width = True)
 
                 with col3:
                     injured_prev = df[df['Year']== 2018]['Number of Injured'].sum()
@@ -130,7 +130,7 @@ def run():
                                 height=300)
                     fig.update_traces(delta_increasing_color='red', selector=dict(type='indicator'))
                     fig.update_traces(delta_decreasing_color='green', selector=dict(type='indicator'))
-                    st.plotly_chart(fig)
+                    st.plotly_chart(fig,use_container_width = True)
 
                 with col5:
                     death_prev = df[df['Year']== 2018]['Deaths'].sum()
@@ -147,7 +147,7 @@ def run():
                                 height=300)
                     fig.update_traces(delta_increasing_color='red', selector=dict(type='indicator'))
                     fig.update_traces(delta_decreasing_color='green', selector=dict(type='indicator'))
-                    st.plotly_chart(fig)
+                    st.plotly_chart(fig,use_container_width = True)
 
             #Total Terrorist Attacks, Total Deaths and Total Injuries Worldwide by Year 2000-2019
             
@@ -194,9 +194,7 @@ def run():
                     ),
                     showlegend=True)
                     #plot_bgcolor= 'rgba(0,0,0,0)')
-            st.plotly_chart(fig)
-
-        ### Targeted groups and kills
+            st.plotly_chart(fig,use_container_width = True)        ### Targeted groups and kills
             targets = df[['Target']]
             targets = targets.reset_index()
             targets =targets.groupby(['Target']).count().sort_values(by = ['eventid'],ascending = False).head(11)
@@ -237,7 +235,7 @@ def run():
                     plot_bgcolor= 'rgba(0,0,0,0)',
                     title = "Top 10 Most Targeted Groups"
                 )
-            st.plotly_chart(fig)
+            st.plotly_chart(fig,use_container_width = True)
             #### Method of attacks
             attacks = df[['Attack Type','Deaths']]
             at =attacks.groupby('Attack Type').sum().sort_values(by = ['Deaths'],ascending= False)
@@ -297,7 +295,7 @@ def run():
                     ),
                     showlegend=True)
                     #plot_bgcolor= 'rgba(0,0,0,0)')
-            st.plotly_chart(fig)
+            st.plotly_chart(fig,use_container_width = True)
 
             ### 10 Most Suicidal Terrorist Groups
             suicidal = df[df['Weapon Sub Type'] == 'Suicide (carried bodily by human being)']
@@ -332,7 +330,7 @@ def run():
                     xaxis_tickangle=-45,
                     plot_bgcolor= 'rgba(0,0,0,0)'
                 )
-            st.plotly_chart(fig1)
+            st.plotly_chart(fig1,use_container_width = True)
 
 
             dg = df[['Perpetrator Name','Deaths']]
@@ -365,7 +363,7 @@ def run():
                     xaxis_tickangle=-45,
                     plot_bgcolor= 'rgba(0,0,0,0)'
                 )
-            st.plotly_chart(fig)
+            st.plotly_chart(fig,use_container_width = True)
         if tab == "Comments":
             comment()
         comm = st.sidebar.checkbox("Add Comment")
